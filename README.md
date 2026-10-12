@@ -9,7 +9,7 @@ To use this program, you will need to install the following:
  - Python (available from the Python website)
  - The PySerial library (can be installed by running `pip install pySerial`)
  - The OpenAI API (available from the OpenAI website)
- - The OpenAI Python library (can be installed by running `pip install openai`)
+ - The OpenAI Python library (can be installed by running `pip install --upgrade openai`)
 
 ## Usage
 
@@ -25,6 +25,5 @@ To use this program, you will need to install the following:
 
  - This program has only been tested on a TI 84 Plus CE calculator and may not work on other calculator models.
  - Newer TIOS versions may require modification to run the program. I am running it on OS 5.1
- - The OpenAI API requires an API key, which can be obtained from the OpenAI website. You will need to set this API key as an environment variable named `openai.api_key` in the python script.
+ - The OpenAI API requires an API key, which can be obtained from the OpenAI website. Set it as an environment variable named `OPENAI_API_KEY` before running the Python script.
  - There are some issues getting input from the user that you may run into.
-

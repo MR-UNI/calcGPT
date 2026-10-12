@@ -1,4 +1,5 @@
-import openai
+import os
+from openai import OpenAI
 import serial
 import sys
 import glob
@@ -37,21 +38,37 @@ print("Enter your selection:")
 port = input()
 ser = serial.Serial(serial_ports()[int(port)], 9600)
 ser.write(b'ack') #ack connection
-openai.api_key = "YOUR KEY HERE"
+api_key = os.getenv("OPENAI_API_KEY")
+if not api_key:
+    raise RuntimeError("Missing OPENAI_API_KEY environment variable.")
+client = OpenAI(api_key=api_key)
 messages = [ {"role": "system", "content": 
               "You are a intelligent assistant."} ]
 while True:
     message = ser.readline()
     message = message.decode('utf-8')
     print(message)
-    if message:
-        messages.append(
-            {"role": "user", "content": message},
+    if not message:
+        continue
+
+    messages.append(
+        {"role": "user", "content": message},
+    )
+
+    try:
+        response = client.responses.create(
+            model="gpt-4o-mini",
+            input=[{"role": m["role"], "content": m["content"]} for m in messages],
         )
-        chat = openai.ChatCompletion.create(
-            model="gpt-3.5-turbo", messages=messages
-        )
-    reply = chat.choices[0].message.content
+        reply = response.output_text.strip() if response.output_text else ""
+    except Exception as err:
+        print(f"OpenAI API error: {err}")
+        reply = ""
+
+    if not reply:
+        print("OpenAI API returned an empty response.")
+        reply = "I couldn't generate a response."
+
     print(f"ChatGPT: {reply}")
     messages.append({"role": "assistant", "content": reply})
     chunk_size = 63 #The buffer is only 64 characters on the calculator. We must break the message down into 64 byte increments to avoid issues.
